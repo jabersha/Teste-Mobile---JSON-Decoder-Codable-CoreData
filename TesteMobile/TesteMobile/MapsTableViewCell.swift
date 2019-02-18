@@ -10,7 +10,14 @@ import UIKit
 
 class MapsTableViewCell: UITableViewCell {
 
+    var url: String!
     @IBOutlet weak var nameLb: UILabel!
     @IBOutlet weak var descripLb: UILabel!
+
+
+
+    @IBAction func callUrl(_ sender: UIButton) {
+        UIApplication.shared.open(URL(string: url.replacingOccurrences(of: " ", with: ""))!, options: [:], completionHandler: nil)
+    }
     
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -34,7 +35,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="89.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mapa da cidade de São Paulo" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmQ-OS-ZaE">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mapa da cidade de São Paulo" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmQ-OS-ZaE">
                                                     <rect key="frame" x="14" y="39.5" width="300" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="rLe-tj-ZR0"/>
@@ -49,10 +50,20 @@
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="190" id="YYo-7V-Pus"/>
                                                     </constraints>
-                                                    <fontDescription key="fontDescription" name="HoeflerText-Black" family="Hoefler Text" pointSize="20"/>
+                                                    <fontDescription key="fontDescription" name="TimesNewRomanPS-BoldMT" family="Times New Roman" pointSize="26"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p4h-fl-yIl">
+                                                    <rect key="frame" x="337" y="21" width="31" height="47"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" image="icons8-forward-100">
+                                                        <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="callUrl:" destination="TxC-rm-1zu" eventType="touchUpInside" id="vXK-43-1Vb"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="zmQ-OS-ZaE" secondAttribute="bottom" constant="10" id="FAN-0N-hdP"/>
@@ -110,4 +121,7 @@
             <point key="canvasLocation" x="53.600000000000001" y="36.431784107946029"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="icons8-forward-100" width="100" height="100"/>
+    </resources>
 </document>

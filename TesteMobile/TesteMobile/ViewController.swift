@@ -25,21 +25,30 @@ struct Mapas: Codable {
 }
 
 
-class ViewController: UIViewController, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var mapsTb: UITableView!
-    
+    var teste: [Mapas] = []
+
+    @IBAction func actBt(_ sender: Any) {
+        let url = URL(string: "http://www.google.com")
+        UIApplication.shared.open(url!, options: [:], completionHandler: nil)
+    }
+
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return teste.count
+    }
+
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        loadMaps()
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
-        
-        
-        
+        cell.nameLb.text = teste[indexPath.row].name
+        cell.descripLb.text = teste[indexPath.row].description
+        cell.url = teste[indexPath.row].url_pdf
         return cell
 
     }
@@ -48,6 +57,10 @@ class ViewController: UIViewController, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mapsTb.dataSource = self
+        self.mapsTb.delegate = self
+
+        loadMaps()
+      //  linkRedirect.addTarget(self, action: "actBt", forControlEvents: .TouchUpInside)
         
         
     }
@@ -66,7 +79,10 @@ class ViewController: UIViewController, UITableViewDataSource {
                 let model = try decoder.decode([InformacaoMapas].self, from: dataResponse)
                 
                 for _ in model{
-                    print(model[0].mapCount)
+                    print(model)
+                     print(model[0].mapCount)
+
+                    self.teste = model[0].maps
 
                     for _ in model[0].maps{
 
@@ -76,6 +92,7 @@ class ViewController: UIViewController, UITableViewDataSource {
             } catch let parsingError{
                 print("Error", parsingError)
             }
+            self.mapsTb.reloadData()
         }
         task.resume()
         

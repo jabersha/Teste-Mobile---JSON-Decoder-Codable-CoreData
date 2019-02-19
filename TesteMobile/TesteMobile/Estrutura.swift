@@ -1,3 +1,4 @@
+
 struct InformacaoMapas: Codable {
     let lastUpdate: String
     let mapCount: Int

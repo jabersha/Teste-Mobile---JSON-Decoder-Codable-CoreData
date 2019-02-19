@@ -8,21 +8,21 @@
 
 import UIKit
 
-struct InformacaoMapas: Codable {
-    let lastUpdate: String
-    let mapCount: Int
-    let maps: [Mapas]
-    
-}
-
-struct Mapas: Codable {
-    let id: String
-    let name: String
-    let description: String
-    let url_pdf: String
-    
-
-}
+//struct InformacaoMapas: Codable {
+//    let lastUpdate: String
+//    let mapCount: Int
+//    let maps: [Mapas]
+//    
+//}
+//
+//struct Mapas: Codable {
+//    let id: String
+//    let name: String
+//    let description: String
+//    let url_pdf: String
+//    
+//
+//}
 
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -31,36 +31,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @IBOutlet weak var countLb: UILabel!
     @IBOutlet weak var updateLb: UILabel!
     @IBOutlet weak var mapsTb: UITableView!
+    @IBOutlet weak var topView: UIView!
+    @IBOutlet weak var bottomView: UIView!
     
     var mapas: [Mapas] = []
     var infoUpdate: String = ""
     var infoMaps: String = ""
-
-
-
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mapas.count
-    }
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
-        cell.nameLb.text = mapas[indexPath.row].name
-        cell.descripLb.text = mapas[indexPath.row].description
-        cell.url = mapas[indexPath.row].url_pdf
-        
-        self.updateLb.text = "Last Update: " + infoUpdate
-        self.countLb.text = "Maps: " + infoMaps
-        
-        
-        
-        return cell
-
-    }
     
     
     override func viewDidLoad() {
@@ -68,8 +44,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
         loadMaps()
-
-        
     }
     
     func loadMaps(){
@@ -86,25 +60,40 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 let model = try decoder.decode([InformacaoMapas].self, from: dataResponse)
                 
                 for _ in model{
-                    print(model)
-                    print(model[0].mapCount)
-
                     self.mapas = model[0].maps
-                    self.infoUpdate = model[0].lastUpdate
-                    self.infoMaps = String(model[0].mapCount)
                 }
+                self.infoUpdate = model[0].lastUpdate
+                self.infoMaps = String(model[0].mapCount)
             } catch let parsingError{
                 print("Error", parsingError)
             }
             self.mapsTb.reloadData()
         }
         task.resume()
-        
     }
-
-
-
-
 
 }
 
+extension ViewController{
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return mapas.count
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
+        cell.nameLb.text = mapas[indexPath.row].name
+        cell.descripLb.text = mapas[indexPath.row].description
+        cell.url = mapas[indexPath.row].url_pdf
+        self.updateLb.text = "Last Update: " + infoUpdate
+        self.countLb.text = "Maps: " + infoMaps
+        
+        
+        
+        return cell
+        
+    }
+}

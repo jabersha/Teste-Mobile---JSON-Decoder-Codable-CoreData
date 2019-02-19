@@ -27,17 +27,20 @@ struct Mapas: Codable {
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    
+    @IBOutlet weak var countLb: UILabel!
+    @IBOutlet weak var updateLb: UILabel!
     @IBOutlet weak var mapsTb: UITableView!
-    var teste: [Mapas] = []
+    
+    var mapas: [Mapas] = []
+    var infoUpdate: String = ""
+    var infoMaps: String = ""
 
-    @IBAction func actBt(_ sender: Any) {
-        let url = URL(string: "http://www.google.com")
-        UIApplication.shared.open(url!, options: [:], completionHandler: nil)
-    }
+
 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return teste.count
+        return mapas.count
     }
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -46,9 +49,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
-        cell.nameLb.text = teste[indexPath.row].name
-        cell.descripLb.text = teste[indexPath.row].description
-        cell.url = teste[indexPath.row].url_pdf
+        cell.nameLb.text = mapas[indexPath.row].name
+        cell.descripLb.text = mapas[indexPath.row].description
+        cell.url = mapas[indexPath.row].url_pdf
+        
+        self.updateLb.text = "Last Update: " + infoUpdate
+        self.countLb.text = "Maps: " + infoMaps
+        
+        
+        
         return cell
 
     }
@@ -58,10 +67,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
-
         loadMaps()
-      //  linkRedirect.addTarget(self, action: "actBt", forControlEvents: .TouchUpInside)
-        
+
         
     }
     
@@ -80,14 +87,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 
                 for _ in model{
                     print(model)
-                     print(model[0].mapCount)
+                    print(model[0].mapCount)
 
-                    self.teste = model[0].maps
-
-                    for _ in model[0].maps{
-
-
-                    }
+                    self.mapas = model[0].maps
+                    self.infoUpdate = model[0].lastUpdate
+                    self.infoMaps = String(model[0].mapCount)
                 }
             } catch let parsingError{
                 print("Error", parsingError)

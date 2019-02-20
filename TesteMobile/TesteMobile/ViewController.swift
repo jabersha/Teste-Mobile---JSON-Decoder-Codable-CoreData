@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController {
     
     
     @IBOutlet weak var countLb: UILabel!
@@ -22,10 +22,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var mapas: [Mapas] = []
     var infoUpdate: String = ""
     var infoMaps: String = ""
-    
+
     var index: Int = 0
     
     var resultados: NSFetchedResultsController <MapData>?
+    var resultadosInfo: NSFetchedResultsController <InfoData>?
     
     var contexto: NSManagedObjectContext{
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -37,10 +38,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
-        
-        
-        showData()
+
         loadMaps()
+//        showData()
+
+
     }
     
     func loadMaps(){
@@ -53,7 +55,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     print(error?.localizedDescription ?? "Response Error")
                     return
             }
-            
+
             do{
                 let decoder = JSONDecoder()
                 let model = try decoder.decode([InformacaoMapas].self, from: dataResponse)
@@ -63,26 +65,33 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 }
                 self.infoUpdate = model[0].lastUpdate
                 self.infoMaps = String(model[0].mapCount)
+
             } catch let parsingError{
+
                 print("Error", parsingError)
             }
             self.mapsTb.reloadData()
         }
         task.resume()
+        //
+
     }
 }
 
-extension ViewController{
+extension ViewController: UITableViewDataSource, UITableViewDelegate{
     
     //Monta tabelas e celulas
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         guard let lista = resultados?.fetchedObjects?.count else {
             return mapas.count
-            
+
         }
+//        if lista == 0 {
+//            return mapas.count
+//        }
         return lista
-        
+
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -91,7 +100,8 @@ extension ViewController{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
-        
+
+
         guard let listaDados = resultados?.fetchedObjects![indexPath.row]
             else {
                 
@@ -100,20 +110,29 @@ extension ViewController{
                 cell.url = mapas[indexPath.row].url_pdf
                 self.updateLb.text = "Last Update: " + infoUpdate
                 self.countLb.text = "Maps: " + infoMaps
-                
+
                 self.index = indexPath.row
                 
                 createData()
                 return cell
             
         }
-        
+
         cell.nameLb.text = listaDados.name
         cell.descripLb.text = listaDados.descript
         cell.url = listaDados.url
-        self.countLb.text = "Maps: "
-        self.updateLb.text = "Last Update: "
-        
+
+        guard let listaInfos = resultadosInfo?.fetchedObjects![1]
+            else {
+                self.updateLb.text = "Last Update: " + infoUpdate
+                self.countLb.text = "Maps: " + infoMaps
+                return cell
+        }
+        self.updateLb.text = "Last Update: " + listaInfos.update!
+        self.countLb.text = "Maps: " + listaInfos.count!
+
+
+
         return cell
     }
 }
@@ -123,14 +142,14 @@ extension ViewController{
     //CoreData
     func createData(){
         let dados = MapData(context: contexto)
-        let teste = InfoData(context: contexto)
+        let information = InfoData(context: contexto)
         
         dados.id = mapas[self.index].id
         dados.name = mapas[self.index].name
         dados.descript = mapas[self.index].description
         dados.url = mapas[self.index].url_pdf
-        teste.update = infoUpdate
-        teste.count = infoMaps
+        information.update = infoUpdate
+        information.count = infoMaps
         
         do{
             try contexto.save()
@@ -143,16 +162,28 @@ extension ViewController{
     
     func showData(){
         let pesquisaMap:NSFetchRequest<MapData> = MapData.fetchRequest()
-        loadMaps()
         let ordenacao = NSSortDescriptor(key: "name", ascending: true)
         pesquisaMap.sortDescriptors = [ordenacao]
+
+        let pesquisaInfo:NSFetchRequest<InfoData> = InfoData.fetchRequest()
+        let ordenacaoInfo = NSSortDescriptor(key: "count", ascending: true)
+        pesquisaInfo.sortDescriptors = [ordenacaoInfo]
+
+         resultadosInfo = NSFetchedResultsController(fetchRequest: pesquisaInfo, managedObjectContext: contexto, sectionNameKeyPath: nil, cacheName: nil)
         
         resultados = NSFetchedResultsController(fetchRequest: pesquisaMap, managedObjectContext: contexto, sectionNameKeyPath: nil, cacheName: nil)
         
         do{
+            try resultadosInfo?.performFetch()
             try resultados?.performFetch()
         } catch {
             print("Erro ao puxar")
         }
+
     }
+}
+
+extension ViewController{
+//para testes
+
 }

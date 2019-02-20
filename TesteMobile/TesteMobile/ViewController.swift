@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -22,12 +23,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var infoUpdate: String = ""
     var infoMaps: String = ""
     
+    var index: Int = 0
+    
+    var resultados: NSFetchedResultsController <MapData>?
+    
+    var contexto: NSManagedObjectContext{
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        return appDelegate.persistentContainer.viewContext
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
         loadMaps()
+        showData()
     }
     
     func loadMaps(){
@@ -60,7 +71,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
 extension ViewController{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mapas.count
+        
+        guard let lista = resultados?.fetchedObjects?.count else {
+            return mapas.count
+            
+        }
+        return lista
+        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -69,15 +86,68 @@ extension ViewController{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MapsTableViewCell
-        cell.nameLb.text = mapas[indexPath.row].name
-        cell.descripLb.text = mapas[indexPath.row].description
-        cell.url = mapas[indexPath.row].url_pdf
-        self.updateLb.text = "Last Update: " + infoUpdate
-        self.countLb.text = "Maps: " + infoMaps
+        
+        guard let listaDados = resultados?.fetchedObjects![indexPath.row]
+            else {
+                
+                cell.nameLb.text = mapas[indexPath.row].name
+                cell.descripLb.text = mapas[indexPath.row].description
+                cell.url = mapas[indexPath.row].url_pdf
+                self.updateLb.text = "Last Update: " + infoUpdate
+                self.countLb.text = "Maps: " + infoMaps
+                
+                self.index = indexPath.row
+                createData()
+                return cell
+            
+        }
+        
+        cell.nameLb.text = listaDados.name
+        cell.descripLb.text = listaDados.descript
+        cell.url = listaDados.url
         
         
-        
+
         return cell
+    }
+}
+
+extension ViewController{
+    //CoreData
+    func createData(){
+         let dados = MapData(context: contexto)
+        
+        dados.id = mapas[self.index].id
+        print(dados.id!)
+        dados.name = mapas[self.index].name
+        dados.descript = mapas[self.index].description
+        dados.url = mapas[self.index].url_pdf
+        
+        do{
+            try contexto.save()
+            print(dados.id!)
+            print("Salvo")
+        } catch {
+            print("Erro")
+        }
         
     }
+    
+    func showData(){
+        let pesquisaMap:NSFetchRequest<MapData> = MapData.fetchRequest()
+        let ordenacao = NSSortDescriptor(key: "name", ascending: true)
+        pesquisaMap.sortDescriptors = [ordenacao]
+        
+        resultados = NSFetchedResultsController(fetchRequest: pesquisaMap, managedObjectContext: contexto, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do{
+            try resultados?.performFetch()
+        } catch {
+            print("Erro ao puxar")
+        }
+        
+    }
+    
+   
+    
 }

@@ -167,10 +167,8 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="bottomView" destination="FpG-F8-fBA" id="J9u-Kp-KD4"/>
                         <outlet property="countLb" destination="RFy-CR-kmb" id="F0Y-Nb-tqs"/>
                         <outlet property="mapsTb" destination="dFb-vx-rx5" id="ceB-3x-svV"/>
-                        <outlet property="topView" destination="lFX-FD-pX6" id="uaX-et-PaC"/>
                         <outlet property="updateLb" destination="uqO-4F-zjG" id="fke-LW-fDR"/>
                     </connections>
                 </viewController>

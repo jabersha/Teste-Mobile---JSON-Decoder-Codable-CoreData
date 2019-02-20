@@ -16,8 +16,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @IBOutlet weak var countLb: UILabel!
     @IBOutlet weak var updateLb: UILabel!
     @IBOutlet weak var mapsTb: UITableView!
-    @IBOutlet weak var topView: UIView!
-    @IBOutlet weak var bottomView: UIView!
+    
+    
     
     var mapas: [Mapas] = []
     var infoUpdate: String = ""
@@ -37,11 +37,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
-        loadMaps()
+        
+        
         showData()
+        loadMaps()
     }
     
     func loadMaps(){
+        
+        //Recebe Json
         guard let url = URL(string: "https://us-central1-teste-mobile-atech.cloudfunctions.net/maps") else {return}
         let task = URLSession.shared.dataTask(with: url) { (dados, resposta, error) in
             guard let dataResponse = dados,
@@ -66,10 +70,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         task.resume()
     }
-
 }
 
 extension ViewController{
+    
+    //Monta tabelas e celulas
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         guard let lista = resultados?.fetchedObjects?.count else {
@@ -106,40 +111,39 @@ extension ViewController{
         cell.nameLb.text = listaDados.name
         cell.descripLb.text = listaDados.descript
         cell.url = listaDados.url
+        self.countLb.text = "Maps: "
+        self.updateLb.text = "Last Update: "
         
-        
-
         return cell
     }
 }
 
 extension ViewController{
+    
     //CoreData
     func createData(){
-         let dados = MapData(context: contexto)
+        let dados = MapData(context: contexto)
+        let teste = InfoData(context: contexto)
         
         dados.id = mapas[self.index].id
-        print(dados.id!)
         dados.name = mapas[self.index].name
         dados.descript = mapas[self.index].description
         dados.url = mapas[self.index].url_pdf
+        teste.update = infoUpdate
+        teste.count = infoMaps
         
         do{
             try contexto.save()
-            print(dados.id!)
             print("Salvo")
         } catch {
             print("Erro")
         }
-        
     }
     
+    
     func showData(){
-        
-        if resultados?.fetchedObjects?.count == 0 {
-            loadMaps()
-        }
         let pesquisaMap:NSFetchRequest<MapData> = MapData.fetchRequest()
+        loadMaps()
         let ordenacao = NSSortDescriptor(key: "name", ascending: true)
         pesquisaMap.sortDescriptors = [ordenacao]
         
@@ -150,9 +154,5 @@ extension ViewController{
         } catch {
             print("Erro ao puxar")
         }
-        
     }
-    
-   
-    
 }

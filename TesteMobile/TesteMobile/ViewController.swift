@@ -97,6 +97,7 @@ extension ViewController{
                 self.countLb.text = "Maps: " + infoMaps
                 
                 self.index = indexPath.row
+                
                 createData()
                 return cell
             
@@ -134,6 +135,10 @@ extension ViewController{
     }
     
     func showData(){
+        
+        if resultados?.fetchedObjects?.count == 0 {
+            loadMaps()
+        }
         let pesquisaMap:NSFetchRequest<MapData> = MapData.fetchRequest()
         let ordenacao = NSSortDescriptor(key: "name", ascending: true)
         pesquisaMap.sortDescriptors = [ordenacao]

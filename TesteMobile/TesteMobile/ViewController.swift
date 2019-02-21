@@ -54,13 +54,11 @@ class ViewController: UIViewController {
                 return
             } else {
                 print("Você está offline")
-                self.showData()
-                
             }
         }
     
 
-        
+        //showData()
 
 
 

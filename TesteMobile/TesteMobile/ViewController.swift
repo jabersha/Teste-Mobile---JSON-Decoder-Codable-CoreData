@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import Network
+
 
 
 class ViewController: UIViewController {
@@ -17,6 +19,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var updateLb: UILabel!
     @IBOutlet weak var mapsTb: UITableView!
     
+    let monitor = NWPathMonitor()
+    let queue = DispatchQueue(label: "Monitor")
     
     
     var mapas: [Mapas] = []
@@ -29,6 +33,7 @@ class ViewController: UIViewController {
     var resultadosInfo: NSFetchedResultsController <InfoData>?
     
     var contexto: NSManagedObjectContext{
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         return appDelegate.persistentContainer.viewContext
     }
@@ -38,9 +43,25 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         self.mapsTb.dataSource = self
         self.mapsTb.delegate = self
+        
+        
+        monitor.start(queue: queue)
+        
+        monitor.pathUpdateHandler = { path in
+            if path.status == .satisfied {
+                print("Você está conectado")
+                self.loadMaps()
+                return
+            } else {
+                print("Você está offline")
+                self.showData()
+                
+            }
+        }
+    
 
-        loadMaps()
-//        showData()
+        
+
 
 
     }
@@ -70,7 +91,10 @@ class ViewController: UIViewController {
 
                 print("Error", parsingError)
             }
-            self.mapsTb.reloadData()
+            DispatchQueue.main.async {
+                self.mapsTb.reloadData()
+            }
+            
         }
         task.resume()
         //
@@ -87,9 +111,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate{
             return mapas.count
 
         }
-//        if lista == 0 {
-//            return mapas.count
-//        }
         return lista
 
     }
@@ -161,6 +182,7 @@ extension ViewController{
     
     
     func showData(){
+
         let pesquisaMap:NSFetchRequest<MapData> = MapData.fetchRequest()
         let ordenacao = NSSortDescriptor(key: "name", ascending: true)
         pesquisaMap.sortDescriptors = [ordenacao]
@@ -168,8 +190,6 @@ extension ViewController{
         let pesquisaInfo:NSFetchRequest<InfoData> = InfoData.fetchRequest()
         let ordenacaoInfo = NSSortDescriptor(key: "count", ascending: true)
         pesquisaInfo.sortDescriptors = [ordenacaoInfo]
-
-         resultadosInfo = NSFetchedResultsController(fetchRequest: pesquisaInfo, managedObjectContext: contexto, sectionNameKeyPath: nil, cacheName: nil)
         
         resultados = NSFetchedResultsController(fetchRequest: pesquisaMap, managedObjectContext: contexto, sectionNameKeyPath: nil, cacheName: nil)
         
@@ -185,5 +205,8 @@ extension ViewController{
 
 extension ViewController{
 //para testes
+    func preload(){
+        _ = self.view
+    }
 
 }
